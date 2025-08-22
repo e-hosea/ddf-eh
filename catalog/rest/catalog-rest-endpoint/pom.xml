@@ -228,7 +228,6 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
                             !ddf.catalog.content.data.impl,
-                            !org.codice.ddf.endpoints.rest,
                             *
                         </Import-Package>
                         <Embed-Dependency>
@@ -236,10 +235,10 @@
                             catalog-core-api-impl,
                             owasp-java-html-sanitizer,
                             asm,
-                            json-smart,
-                            catalog-rest-endpoint
+                            json-smart
                         </Embed-Dependency>
                         <Export-Package>
+                            org.codice.ddf.endpoints,
                             org.codice.ddf.endpoints.rest
                         </Export-Package>
                         <Include-Resource>{maven-resources},META-INF/maven=${project.build.outputDirectory}/META-INF/maven</Include-Resource>

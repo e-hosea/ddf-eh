@@ -370,6 +370,8 @@ public class RESTEndpoint implements RESTService {
       @Context HttpServletRequest httpRequest,
       @QueryParam("transform") String transformerParam,
       InputStream message) {
+
+    LOGGER.info("PATPAT: Rest Endpoint addDocument() text/application");
     return addDocument(headers, requestUriInfo, httpRequest, null, transformerParam, message);
   }
 
@@ -390,14 +392,28 @@ public class RESTEndpoint implements RESTService {
       @QueryParam("transform") String transformerParam,
       InputStream message) {
     try {
+      LOGGER.info("PATPAT: Rest Endpoint addDocument() multipart");
+
+      // Print current endpoint
+      String requestUri = requestUriInfo.getRequestUri().toString(); // Full URI
+      String absolutePath =
+          requestUriInfo.getAbsolutePath().toString(); // Absolute path without query params
+      //      String baseUri = requestUriInfo.getBaseUri().toString(); // Base URL of the service
+
+      LOGGER.info("Request URI: {}", requestUri);
+      LOGGER.info("Absolute Path: {}", absolutePath);
+      //      LOGGER.info("Base URI: {}", baseUri);
+
       List<String> contentTypeList = headers.getRequestHeader(HttpHeaders.CONTENT_TYPE);
       String id =
           catalogService.addDocument(contentTypeList, multipartBody, transformerParam, message);
 
+      LOGGER.info("PATPAT: Rest Endpoint after catalogService.addDocument()");
       UriBuilder uriBuilder = requestUriInfo.getAbsolutePathBuilder().path("/" + id);
       ResponseBuilder responseBuilder = Response.created(uriBuilder.build());
       responseBuilder.header(Metacard.ID, id);
 
+      LOGGER.info("PATPAT: Rest Endpoint before return");
       return responseBuilder.build();
 
     } catch (CatalogServiceException e) {

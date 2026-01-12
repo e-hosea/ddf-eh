@@ -169,7 +169,7 @@ public class SolrMetacardClientImpl implements SolrMetacardClient {
       FilterAdapter catalogFilterAdapter,
       SolrFilterDelegateFactory solrFilterDelegateFactory,
       DynamicSchemaResolver dynamicSchemaResolver) {
-    this.client = client;
+    this.client = new SolrClientWrapper(client, "ddf_solr", "DDFSolrPassword");
     filterDelegateFactory = solrFilterDelegateFactory;
     filterAdapter = catalogFilterAdapter;
     resolver = dynamicSchemaResolver;

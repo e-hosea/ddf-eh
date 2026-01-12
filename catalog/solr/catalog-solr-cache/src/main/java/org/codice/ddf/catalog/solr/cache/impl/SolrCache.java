@@ -26,6 +26,7 @@ import ddf.catalog.operation.SourceResponse;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.catalog.source.solr.DynamicSchemaResolver;
 import ddf.catalog.source.solr.SchemaFields;
+import ddf.catalog.source.solr.SolrClientWrapper;
 import ddf.catalog.source.solr.SolrFilterDelegateFactory;
 import ddf.catalog.source.solr.SolrMetacardClient;
 import java.io.IOException;
@@ -128,7 +129,7 @@ public class SolrCache {
       CacheSolrMetacardClient metacardClient,
       Supplier<ScheduledExecutorService> schedulerCreator,
       List<CachePutPlugin> cachePutPlugins) {
-    this.client = client;
+    this.client = new SolrClientWrapper(client, "ddf_solr", "DDFSolrPassword");
     this.metacardClient = metacardClient;
     this.schedulerCreator = schedulerCreator;
     this.cachePutPlugins = cachePutPlugins;

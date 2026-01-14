@@ -26,7 +26,7 @@ import ddf.catalog.operation.SourceResponse;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.catalog.source.solr.DynamicSchemaResolver;
 import ddf.catalog.source.solr.SchemaFields;
-import ddf.catalog.source.solr.SolrClientWrapper;
+import ddf.catalog.source.solr.SolrClientAuthWrapper;
 import ddf.catalog.source.solr.SolrFilterDelegateFactory;
 import ddf.catalog.source.solr.SolrMetacardClient;
 import java.io.IOException;
@@ -120,7 +120,11 @@ public class SolrCache {
       SolrClient client,
       CacheSolrMetacardClient metacardClient,
       List<CachePutPlugin> cachePutPlugins) {
-    this(client, metacardClient, SolrCache::createScheduler, cachePutPlugins);
+    this(
+        new SolrClientAuthWrapper(client),
+        metacardClient,
+        SolrCache::createScheduler,
+        cachePutPlugins);
   }
 
   @VisibleForTesting
@@ -129,7 +133,7 @@ public class SolrCache {
       CacheSolrMetacardClient metacardClient,
       Supplier<ScheduledExecutorService> schedulerCreator,
       List<CachePutPlugin> cachePutPlugins) {
-    this.client = new SolrClientWrapper(client, "ddf_solr", "DDFSolrPassword");
+    this.client = new SolrClientAuthWrapper(client);
     this.metacardClient = metacardClient;
     this.schedulerCreator = schedulerCreator;
     this.cachePutPlugins = cachePutPlugins;
@@ -145,9 +149,12 @@ public class SolrCache {
       DynamicSchemaResolver dynamicSchemaResolver,
       List<CachePutPlugin> cachePutPlugins) {
     this(
-        client,
+        new SolrClientAuthWrapper(client),
         new CacheSolrMetacardClient(
-            client, adapter, solrFilterDelegateFactory, dynamicSchemaResolver),
+            new SolrClientAuthWrapper(client),
+            adapter,
+            solrFilterDelegateFactory,
+            dynamicSchemaResolver),
         cachePutPlugins);
   }
 
@@ -302,6 +309,7 @@ public class SolrCache {
       try {
         LOGGER.debug("Expiring cache.");
         client.deleteByQuery(CACHED_DATE + ":[* TO NOW-" + expirationAgeInMinutes + "MINUTES]");
+        LOGGER.debug("Expiring cache successful");
       } catch (SolrServerException | SolrException | IOException e) {
         LOGGER.info("Unable to expire cache; {}", e.getMessage());
         LOGGER.debug("Cache expiration error.", e);
